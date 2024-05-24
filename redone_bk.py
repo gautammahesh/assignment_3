@@ -113,6 +113,10 @@ class ResaleDataManager:
         search_list = []
         temp_list = []
         town_search = input("Enter town name (not mandatory): ").strip().upper()
+        if town_search is not empty
+            town_search_array=town_search.split(",")
+        #bishan
+        #bishan, Yishun
         flat_type_search = input("Enter flat type (not mandatory): ").strip().upper()
         flat_model_search = input("Enter flat model (not mandatory): ").strip().upper()
         #print("<-->", town_search, "<-->", flat_type_search, "<-->", flat_model_search, "<-->")
@@ -120,8 +124,15 @@ class ResaleDataManager:
         #ResaleData resaleData;
         if town_search != "":
             for resaleData in transactions:
-                if resaleData.get_town() == town_search:
-                    search_list.append(resaleData)
+                # if town_search_array.index(resaleData.get_town()) >=0:
+                #     print("Got it")
+                for town in town_search_array:
+                    if resaleData.get_town() == town:
+                        search_list.append(resaleData)
+            
+            if search_list is null
+                raise Exception
+                
             temp_list = search_list
             # search_list = None
             search_list = []
