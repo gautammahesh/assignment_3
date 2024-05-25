@@ -1,6 +1,6 @@
-# import logging
+import logging
 
-# logging.basicConfig(filename='error_log.txt',filemode = 'w', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='error_log.txt',filemode = 'w', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # rise exception when towns are not matching
 # pass two or more towns in search
@@ -38,7 +38,7 @@ class ResaleData:
         except ValueError as e:  
             self.set_error_flag(True)
             #print("An exception occurred:", str(e))
-            # logging.error("Value error %s ", str(e))
+            logging.error("Value error %s ", str(e))
             self.__error_message = f"Invalid data : {month} || {town} || {flat_type} || {block} || {street_name} || {storey_range} || {floor_area_sqm} || {flat_model} || {lease_commence_date} || {remaining_lease} || {resale_price}"
         
         
@@ -120,94 +120,98 @@ class ResaleDataManager:
 
     def search(self, transactions):
         search_list = []
-        temp_list = []
+        #temp_list = []
+
+        town_list=[]
+        flat_type_list=[]
+        flat_model_list=[]
+
         town_search = input("Enter town name (not mandatory): ").strip().upper()
         flat_type_search = input("Enter flat type (not mandatory): ").strip().upper()
         flat_model_search = input("Enter flat model (not mandatory): ").strip().upper()
         #print("<-->", town_search, "<-->", flat_type_search, "<-->", flat_model_search, "<-->")
-
-        #ResaleData resaleData;
-        # if town_search != "":
-        #     for resaleData in transactions:
-        #         if resaleData.get_town() == town_search:
-        #             search_list.append(resaleData)
-        #     temp_list = search_list
-        #     # search_list = None
-        #     search_list = []
+        isTownFound = False
+        isFlatTypeFound = False
+        isFlatModelFound = False 
+        searchResult=""
+ 
 
         if town_search:
             town_search_array = town_search.split(",")
+            print(" search len(town_search_array) :::: ",len(town_search_array))
             for i in range(len(town_search_array)):
                 town_search_array[i] = town_search_array[i].strip()
-            search_list = []
             for resaleData in transactions:
                 if resaleData.get_town() in town_search_array:
-                    search_list.append(resaleData)
-            temp_list = search_list
-            search_list = []
+                    town_list.append(resaleData)
+                    isTownFound= True
+
+            if not  town_list:
+                 searchResult="Town search not matching with the input passed \n"
+
+            search_list.extend(town_list)
+        else:
+             isTownFound= True 
+        print("len(search_list) after TOWN search :::: ",len(search_list))  
         
 
-        
-
-            
-        # if flat_type_search != "":
-        #     for resaleData in temp_list:
-        #         if resaleData.get_flat_type() == flat_type_search:
-        #             search_list.append(resaleData)
-
-        #     temp_list = search_list # check this out
-        #     search_list = []
+ 
 
         if flat_type_search:
             flat_type_search_array = flat_type_search.split(",")
+            print(" search len(flat_type_search_array) :::: ",len(flat_type_search_array))
+ 
             for i in range(len(flat_type_search_array)):
                 flat_type_search_array[i] = flat_type_search_array[i].strip()
-            search_list = []
-            for resaleData in transactions:
+            for resaleData in search_list:
                 if resaleData.get_flat_type() in flat_type_search_array:
-                    search_list.append(resaleData)
-            temp_list = search_list
-            search_list = []
+                    flat_type_list.append(resaleData)
+                    isFlatTypeFound= True 
+            if not  flat_type_list:
+                 searchResult="Flat Type search not matching with the input passed\n"
+            else: 
+                search_list = flat_type_list
+        else:
+            isFlatTypeFound= True 
         
-
-        # if flat_model_search != "":
-        #     for resaleData in temp_list:
-        #         # print("inside flat model")
-        #         if resaleData.get_flat_model() == flat_model_search:
-        #             # print("inside flat model: INSIDE IF ")
-        #             search_list.append(resaleData)
-        #     # print(len(search_list))
-        #     temp_list = search_list # check this out
-            # search_list = []
-
+        print("len(search_list) after FLAT TYPE search :::: ",len(search_list))  
+        
         if flat_model_search:
             flat_model_search_array = flat_model_search.split(",")
-            for i in range(len(flat_model_search)):
+            print(" search len(flat_model_search_array) :::: ",len(flat_model_search_array),"<----->" ,flat_model_search_array)
+
+            for i in range(len(flat_model_search_array)):
                 flat_model_search_array[i] = flat_model_search_array[i].strip()
-            search_list = []
-            for resaleData in transactions:
-                if resaleData.flat_model_search() in flat_model_search_array:
-                    search_list.append(resaleData)
-            temp_list = search_list
-            search_list = []
 
-        # if len(search_list) == 0:
-        #     search_list = temp_list
-
+            for resaleData in search_list:
+                #print(" FOR IF ",resaleData.get_flat_model(),"<----->" ,flat_model_search_array)
+                if resaleData.get_flat_model() in flat_model_search_array:
+                    #print("INSIDE FOR IF ",resaleData.get_flat_model(),"<----->" ,flat_model_search_array)
+                    flat_model_list.append(resaleData)
+                    isFlatModelFound = True 
+            if not  flat_model_list:
+                 searchResult="Flat Model search not matching with the input passed\n"
+            else:
+                search_list = flat_model_list
+        else:
+            isFlatModelFound= True 
+ 
+        print("len(search_list) after FLAT MODEL  search :::: ",len(flat_model_list))  
+        print(" search len(search_list) ::::>>>> ",len(search_list))
+ 
         if not search_list:
-            search_list = temp_list
-
-        # if len(search_list) == 0:
-        #     # search_list = temp_list
-        #     print("NO DATA FOUND FOR THE SEARCH PROVIDED")
-
-        if not search_list:
-        # logging.info("No data found for the search provided.")
+            if (not isTownFound) or (not isFlatTypeFound) or (not isFlatModelFound):
+                #print("Incorrect search :::", searchResult)
+                raise ResaleDataException("Incorrect search :::", searchResult)
             raise ResaleDataException("NO DATA FOUND FOR THE SEARCH PROVIDED")
 
-
         for resaleData in search_list:
+            #print( type(resaleData))
             print(resaleData.display())
+
+        if (not isTownFound) or (not isFlatTypeFound) or (not isFlatModelFound):
+            print("Incorrect search :::", searchResult)
+            raise ResaleDataException(searchResult)
 
 
 def main():
@@ -235,50 +239,20 @@ def main():
                 flat_model_set = manager.get_flat_model(transactions)
                 print(flat_model_set)
             elif options == 4:
-                manager.search(transactions)
-                manager.write_error_records(transactions)
+                try:
+                    manager.search(transactions)
+                    manager.write_error_records(transactions)
+                except Exception as e:
+                    print(e)
             elif options == 5:
                 print("Thank You")
                 break
                 
     except Exception as e:
-        # logging.error("Unexpected error %s", str(e))
-        print("An unexpected error occurred:", str(e))
+        logging.error("Unexpected error %s", str(e))
+        print("An unexpected error occurred:", e )
 
 
 
 main()
-
-# def search(self, transactions):
-#         search_list = []
-#         temp_list = transactions
-#         town_search = input("Enter town name(s) (not mandatory, separated by commas): ").strip().upper()
-#         flat_type_search = input("Enter flat type(s) (not mandatory, separated by commas): ").strip().upper()
-#         flat_model_search = input("Enter flat model(s) (not mandatory, separated by commas): ").strip().upper()
-
-#         if town_search:
-#             town_search_array = [town.strip() for town in town_search.split(",")]
-#             search_list = [resaleData for resaleData in temp_list if resaleData.get_town() in town_search_array]
-#             temp_list = search_list
-#             search_list = []
-
-#         if flat_type_search:
-#             flat_type_search_array = [flat_type.strip() for flat_type in flat_type_search.split(",")]
-#             search_list = [resaleData for resaleData in temp_list if resaleData.get_flat_type() in flat_type_search_array]
-#             temp_list = search_list
-#             search_list = []
-
-#         if flat_model_search:
-#             flat_model_search_array = [flat_model.strip() for flat_model in flat_model_search.split(",")]
-#             search_list = [resaleData for resaleData in temp_list if resaleData.get_flat_model() in flat_model_search_array]
-#             temp_list = search_list
-
-#         if not search_list:
-#             search_list = temp_list
-
-#         if not search_list:
-#             logging.info("No data found for the search provided.")
-#             raise ResaleDataException("NO DATA FOUND FOR THE SEARCH PROVIDED")
-
-#         for resaleData in search_list:
-#             print(resaleData.display())
+ 
