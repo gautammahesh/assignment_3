@@ -3,11 +3,11 @@ import logging
 logging.basicConfig(filename='error_log.txt',filemode = 'w', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Custom exception class for handling resale data related errors
-class ResaleDataException(Exception):
+class ResaleException(Exception):
     pass
 
-# ResaleData Class representing a resale data record
-class ResaleData:
+# ResaleTransaction Class representing a resale data record
+class ResaleTransaction:
     # Initializing all instance variables
     def __init__(self, month, town, flat_type, block, street_name, storey_range, floor_area_sqm, flat_model, lease_commence_date, remaining_lease, resale_price):
         self.__month = month
@@ -64,8 +64,8 @@ class ResaleData:
     def __str__(self):
         return (f"{self.__month}, {self.__town}, {self.__flat_type}, {self.__block}, {self.__street_name}, {self.__storey_range}, {self.__floor_area_sqm}, {self.__flat_model}, {self.__lease_commence_date}, {self.__remaining_lease}, {self.__resale_price}")
     
-# ResaleDataManager Class manages resale data operations
-class ResaleDataManager: 
+# HDB_Resale_App Class manages resale data operations
+class HDB_Resale_App: 
 
     # Method to read resale data from a file
     def read_resale_data(self, datafile):
@@ -79,13 +79,14 @@ class ResaleDataManager:
                         continue
                     month, town, flat_type, block, street_name, storey_range, floor_area_sqm, flat_model, lease_commence_date, remaining_lease, resale_price = line.strip().split(',')
 
-                    # Creating ResaleData object and adding it to transactions list
-                    resale_data = ResaleData(month, town, flat_type, block, street_name, storey_range, floor_area_sqm, flat_model, lease_commence_date, remaining_lease, resale_price)    # new
+                    # Creating ResaleTransaction object and adding it to transactions list
+                    resale_data = ResaleTransaction(month, town, flat_type, block, street_name, storey_range, floor_area_sqm, flat_model, lease_commence_date, remaining_lease, resale_price)    # new
                     transactions.append(resale_data)
 
                 return transactions
         except Exception as e:
             print("An unexpected error occurred:", str(e))
+            return e
 
     # Method to write error records to a file
     def write_error_records(self, transactions):
@@ -128,6 +129,7 @@ class ResaleDataManager:
         town_list=[]
         flat_type_list=[]
         flat_model_list=[]
+        
         town_search = input("Enter town name (not mandatory): ").strip().upper()
         flat_type_search = input("Enter flat type (not mandatory): ").strip().upper()
         flat_model_search = input("Enter flat model (not mandatory): ").strip().upper()
@@ -186,11 +188,11 @@ class ResaleDataManager:
         # Handling no search result
         if not search_list:
             if (not isTownFound) or (not isFlatTypeFound) or (not isFlatModelFound):
-                raise ResaleDataException(searchResult)
-            raise ResaleDataException("NO DATA FOUND FOR THE SEARCH PROVIDED")
+                raise ResaleException(searchResult)
+            raise ResaleException("NO DATA FOUND FOR THE SEARCH PROVIDED")
         
         if (not isTownFound) or (not isFlatTypeFound) or (not isFlatModelFound):
-            raise ResaleDataException(searchResult)
+            raise ResaleException(searchResult)
 
         for resaleData in search_list:
             print(resaleData.__str__())
@@ -198,7 +200,7 @@ class ResaleDataManager:
 def main():
     try:
         datafile = "Resale2024.csv"
-        manager = ResaleDataManager()
+        manager = HDB_Resale_App()
         transactions = manager.read_resale_data(datafile)
         
         # Display the main menu
