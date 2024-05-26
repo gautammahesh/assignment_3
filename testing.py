@@ -73,7 +73,6 @@ class HDB_Resale_App:
             transactions = []
             with open(datafile, 'r') as file:
                 lines = file.readlines()
-                # for line in lines:
                 for index, line in enumerate(lines):
                     if index == 0: 
                         continue
@@ -214,8 +213,13 @@ def main():
             print("5. Exit program")
 
             # Getting user input
-            options = int(input("Enter option (1-5): "))
-            print("")
+            try:
+                options = int(input("Enter option (1-5): "))
+                print("")
+            except Exception as e:
+                print("")
+                print("Invalid input. Enter int value: ")
+                continue
 
             # Execute actions based on user option
             if options == 1:
