@@ -7,8 +7,6 @@ logging.basicConfig(filename='error_log.txt',filemode = 'w', level=logging.INFO,
 # commands to be included
 # grandfather execpetion
 
-
-
 class ResaleDataException(Exception):
     pass
 
@@ -26,21 +24,17 @@ class ResaleData:
         self.__remaining_lease = remaining_lease
         self.__error_flag = False
         self.__error_message=""
-
         self.__resale_price = resale_price
         try:
             self.__floor_area_sqm = float(floor_area_sqm)
             self.__resale_price = float(resale_price)
             if self.__floor_area_sqm < 0 or self.__resale_price < 0:
-                # logging.info("Exception Caught for checking negative value")
                 raise ValueError("Negative Value")
             self.set_error_flag(False)
         except ValueError as e:  
             self.set_error_flag(True)
-            #print("An exception occurred:", str(e))
             logging.error("Value error %s ", str(e))
             self.__error_message = f"Invalid data : {month} || {town} || {flat_type} || {block} || {street_name} || {storey_range} || {floor_area_sqm} || {flat_model} || {lease_commence_date} || {remaining_lease} || {resale_price}"
-        
         
     def set_error_flag(self, value):
         self.__error_flag = value
@@ -60,12 +54,10 @@ class ResaleData:
     def get_error_message(self):
         return self.__error_message
     
-   
     def display(self):
         return (f"{self.__month}, {self.__town}, {self.__flat_type}, {self.__block}, {self.__street_name}, {self.__storey_range}, {self.__floor_area_sqm}, {self.__flat_model}, {self.__lease_commence_date}, {self.__remaining_lease}, {self.__resale_price}")
     
 class ResaleDataManager: 
-
     def read_resale_data(self, datafile):
         try:
             transactions = []
@@ -77,13 +69,11 @@ class ResaleDataManager:
                         continue
                     month, town, flat_type, block, street_name, storey_range, floor_area_sqm, flat_model, lease_commence_date, remaining_lease, resale_price = line.strip().split(',')
                     resale_data = ResaleData(month, town, flat_type, block, street_name, storey_range, floor_area_sqm, flat_model, lease_commence_date, remaining_lease, resale_price)    # new
-                    #if not resale_data.get_error_flag():
                     transactions.append(resale_data)
 
                 return transactions
         except Exception as e:
             print("An unexpected error occurred:", str(e))
-
 
     def write_error_records(self, transactions):
         try:
@@ -98,11 +88,9 @@ class ResaleDataManager:
             print("Error reading the file.")
             return ioe
 
-
     def get_town(self, transactions):
         town_set = set()
         for transaction in transactions:
-            # print(hdbflat.get_town())
             town_set.add(transaction.get_town())
         return town_set
         
@@ -120,8 +108,6 @@ class ResaleDataManager:
 
     def search(self, transactions):
         search_list = []
-        #temp_list = []
-
         town_list=[]
         flat_type_list=[]
         flat_model_list=[]
@@ -129,16 +115,14 @@ class ResaleDataManager:
         town_search = input("Enter town name (not mandatory): ").strip().upper()
         flat_type_search = input("Enter flat type (not mandatory): ").strip().upper()
         flat_model_search = input("Enter flat model (not mandatory): ").strip().upper()
-        #print("<-->", town_search, "<-->", flat_type_search, "<-->", flat_model_search, "<-->")
         isTownFound = False
         isFlatTypeFound = False
         isFlatModelFound = False 
         searchResult=""
  
-
         if town_search:
             town_search_array = town_search.split(",")
-            print(" search len(town_search_array) :::: ",len(town_search_array))
+            # print(" search len(town_search_array) :::: ",len(town_search_array))
             for i in range(len(town_search_array)):
                 town_search_array[i] = town_search_array[i].strip()
             for resaleData in transactions:
@@ -147,19 +131,14 @@ class ResaleDataManager:
                     isTownFound= True
 
             if not  town_list:
-                 searchResult="Town search not matching with the input passed \n"
+                 searchResult= f"Town search not matching with the input passed {town_search_array}\n"
 
             search_list.extend(town_list)
         else:
              isTownFound= True 
-        print("len(search_list) after TOWN search :::: ",len(search_list))  
         
-
- 
-
         if flat_type_search:
             flat_type_search_array = flat_type_search.split(",")
-            print(" search len(flat_type_search_array) :::: ",len(flat_type_search_array))
  
             for i in range(len(flat_type_search_array)):
                 flat_type_search_array[i] = flat_type_search_array[i].strip()
@@ -168,51 +147,41 @@ class ResaleDataManager:
                     flat_type_list.append(resaleData)
                     isFlatTypeFound= True 
             if not  flat_type_list:
-                 searchResult="Flat Type search not matching with the input passed\n"
+                 searchResult+= f"Flat Type search not matching with the input passed {flat_type_search_array}\n"
             else: 
                 search_list = flat_type_list
         else:
             isFlatTypeFound= True 
         
-        print("len(search_list) after FLAT TYPE search :::: ",len(search_list))  
-        
         if flat_model_search:
             flat_model_search_array = flat_model_search.split(",")
-            print(" search len(flat_model_search_array) :::: ",len(flat_model_search_array),"<----->" ,flat_model_search_array)
+            # print(" search len(flat_model_search_array) :::: ",len(flat_model_search_array),"<----->" ,flat_model_search_array)
 
             for i in range(len(flat_model_search_array)):
                 flat_model_search_array[i] = flat_model_search_array[i].strip()
 
             for resaleData in search_list:
-                #print(" FOR IF ",resaleData.get_flat_model(),"<----->" ,flat_model_search_array)
                 if resaleData.get_flat_model() in flat_model_search_array:
-                    #print("INSIDE FOR IF ",resaleData.get_flat_model(),"<----->" ,flat_model_search_array)
                     flat_model_list.append(resaleData)
                     isFlatModelFound = True 
             if not  flat_model_list:
-                 searchResult="Flat Model search not matching with the input passed\n"
+                 searchResult+= f"Flat Model search not matching with the input passed {flat_model_search_array}"
             else:
                 search_list = flat_model_list
         else:
             isFlatModelFound= True 
  
-        print("len(search_list) after FLAT MODEL  search :::: ",len(flat_model_list))  
-        print(" search len(search_list) ::::>>>> ",len(search_list))
- 
         if not search_list:
             if (not isTownFound) or (not isFlatTypeFound) or (not isFlatModelFound):
-                #print("Incorrect search :::", searchResult)
-                raise ResaleDataException("Incorrect search :::", searchResult)
+                raise ResaleDataException(searchResult)
             raise ResaleDataException("NO DATA FOUND FOR THE SEARCH PROVIDED")
+        
+        if (not isTownFound) or (not isFlatTypeFound) or (not isFlatModelFound):
+            raise ResaleDataException(searchResult)
 
         for resaleData in search_list:
             #print( type(resaleData))
             print(resaleData.display())
-
-        if (not isTownFound) or (not isFlatTypeFound) or (not isFlatModelFound):
-            print("Incorrect search :::", searchResult)
-            raise ResaleDataException(searchResult)
-
 
 def main():
     try:
@@ -221,6 +190,7 @@ def main():
         transactions = manager.read_resale_data(datafile)
         
         while True:
+            print("")
             print("Main Menu:")
             print("1. Get towns")
             print("2. Get floor type")
@@ -229,13 +199,18 @@ def main():
             print("5. Exit program")
 
             options = int(input("Enter option (1-5): "))
+            print("")
+
             if options == 1:
+                print("Towns: ")
                 town_set = manager.get_town(transactions)
-                print(town_set,"\n")
+                print(town_set)
             elif options == 2:
+                print("Flat types: ")
                 flat_type_set = manager.get_flat_type(transactions)
-                print(flat_type_set,"\n")
+                print(flat_type_set)
             elif options == 3:
+                print("Flat models: ")
                 flat_model_set = manager.get_flat_model(transactions)
                 print(flat_model_set)
             elif options == 4:
@@ -251,8 +226,6 @@ def main():
     except Exception as e:
         logging.error("Unexpected error %s", str(e))
         print("An unexpected error occurred:", e )
-
-
 
 main()
  
